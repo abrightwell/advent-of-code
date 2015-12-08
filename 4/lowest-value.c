@@ -1,4 +1,14 @@
+/* 
+ * Must compile with -lcrypto -lssl (order is important).
+ *
+ * Example:
+ *     gcc -o lowest-value lowest-value.c -lcrypto -lssl
+ *
+ * Usage:
+ *     ./lowest-value <key> <number_of_zeros>
+ */
 #include <regex.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +23,7 @@ int main(int argc, char **argv) {
 	
 	char regex_str[MAX_REGEX_LENGTH];
 	regex_t regex;
-	int reti;
+	int rc;
 
 	char *key = argv[1];
 	char *num_zeros = argv[2];
@@ -26,9 +36,9 @@ int main(int argc, char **argv) {
 
 	snprintf(regex_str, MAX_REGEX_LENGTH, "^0\\{%s\\}", num_zeros);
 
-	reti = regcomp(&regex, regex_str, 0);
+	rc = regcomp(&regex, regex_str, 0);
 
-	if (reti) {
+	if (rc) {
 		printf("Something is wrong with your regex: %s", regex_str);
 	}
 
@@ -43,8 +53,8 @@ int main(int argc, char **argv) {
 			sprintf(&digest_str[i * 2], "%02x", digest[i]);
 		}
 	
-		reti = regexec(&regex, digest_str, 0, NULL, 0);
-		if (!reti) {
+		rc = regexec(&regex, digest_str, 0, NULL, 0);
+		if (!rc) {
 			printf("Digest: %s\n", digest_str);
 			break;
 		}
